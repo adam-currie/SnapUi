@@ -6,7 +6,7 @@ namespace SnapUi {
     public class DropZoneStackPanel : StackPanel, IDropZone {
 
         static DropZoneStackPanel() {
-            //make this hit-testable by default
+            //making this hit-testable by default
             BackgroundProperty.OverrideDefaultValue<DropZoneStackPanel>(Brushes.Pink);//debug (Brushes.Transparent);
         }
 

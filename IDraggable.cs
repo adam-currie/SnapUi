@@ -26,8 +26,7 @@ namespace SnapUi {
             set { SetValue(PreviewStyleProperty, value); }
         }
 
-        //todo: maybe replace origin with a bounding box so that we can render this in drop zones with that
-        public void RenderPreview(DrawingContext context, Point origin);
+        public void RenderPreview(DrawingContext context);
 
         public static readonly StyledProperty<int> MinDragDistanceProperty =
             AvaloniaProperty.Register<IDraggable, int>(nameof(MinDragDistance), 10, true);

@@ -1,27 +1,59 @@
 ﻿using Avalonia;
+using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using System.Diagnostics;
 using System.Linq;
 
 namespace SnapUi {
 
-    public class DragOp {
+    public class DragOp : IDragOp {
         private readonly IDraggable draggable;
+        private readonly DraggablePreview floatingPreviewImg;
 
         private IDropZone? candidateDropZone;
 
-        //todo: when draggable is invalidated, redraw preview, otherwise use cached bitmap
+        public bool IsDisposed {get; private set;}
 
         public DragOp(IDraggable draggable, Point startingPoint) {
             this.draggable = draggable;
+
+            floatingPreviewImg = new DraggablePreview(draggable);
+
+            draggable.GetVisualAncestor<ISnapUiRoot>()
+                .OverlayLayer
+                .Children
+                .Add(floatingPreviewImg);
+
+            //calling update to get some state correct before first draw
+            Update(startingPoint);
         }
 
         public void Update(Point point) {
-            ISnapUiRoot top = draggable.GetVisualAncestor<ISnapUiRoot>();
-            Point screenPoint = (Point)draggable.TranslatePoint(point, top.VisualRoot)!;
+            if (IsDisposed) {
+                throw new System.ObjectDisposedException(ToString());
+            }
 
-            IDropZone? candidateCandidateDropZone = top.VisualRoot.Renderer
-                .HitTest(screenPoint, top, (x) => true)
+            ISnapUiRoot root = draggable.GetVisualAncestor<ISnapUiRoot>();
+
+            /* todo: check if root has changed and migrate everything
+             * -candidate dropzone may no longer be valid     
+             * -preview needs to be reparented
+             */
+
+            UpdateFloatingPreview(point);
+            UpdateCandidateDropZone(point, root);
+        }
+
+        private void UpdateCandidateDropZone(Point point, ISnapUiRoot root) {
+            if (IsDisposed) {
+                throw new System.ObjectDisposedException(ToString());
+            }
+
+            Point rootPoint = (Point)draggable.TranslatePoint(point, root.VisualRoot)!;
+
+            IDropZone? candidateCandidateDropZone = root.VisualRoot.Renderer
+                .HitTest(rootPoint, root, (x) => true)
                 .Where(IsValidDropZoneOrCurrentParent)
                 .FirstOrDefault()
                 as IDropZone;
@@ -31,12 +63,14 @@ namespace SnapUi {
                 candidateCandidateDropZone = null;
             }
 
-            //todo: this is probably redundant 
-            if (candidateDropZone != candidateCandidateDropZone) {
-                candidateDropZone = candidateCandidateDropZone;
-            }
+            candidateDropZone = candidateCandidateDropZone;
+        }
 
-            draggable.InvalidateVisual();
+        private void UpdateFloatingPreview(Point point) {
+            Point previewPoint =
+                (Point)((IVisual)draggable).TranslatePoint(point, floatingPreviewImg.Parent)!;
+            floatingPreviewImg.RenderTransform =
+                new MatrixTransform(Matrix.CreateTranslation(previewPoint));
         }
 
         private bool IsValidDropZoneOrCurrentParent(IVisual v) =>
@@ -44,7 +78,12 @@ namespace SnapUi {
             !draggable.IsVisualAncestorOf(v) &&
             ((v as IDropZone)?.CanAdd(draggable) ?? false);
 
+        /// <inheritdoc/>
         public void Release(Point point) {
+            if (IsDisposed) {
+                throw new System.ObjectDisposedException(ToString());
+            }
+
             if (candidateDropZone != null) {
                 Debug.Assert(candidateDropZone != draggable.Parent);
                 candidateDropZone.Add(draggable);
@@ -52,7 +91,16 @@ namespace SnapUi {
             }
 
             draggable.InvalidateVisual();
+
+            Dispose();
         }
 
+        public void Dispose() {
+            if (!IsDisposed) {
+                OverlayLayer overlay = (OverlayLayer)floatingPreviewImg.Parent;
+                overlay.Children.Remove(floatingPreviewImg);
+                IsDisposed = true;
+            }
+        }
     }
 }

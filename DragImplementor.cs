@@ -3,7 +3,7 @@
 namespace SnapUi {
 
     /// <summary>
-    /// Implements common logic for cref="SnapUi.IDraggable" objects to start drag operations.
+    /// Implements common logic for <c cref="SnapUi.IDraggable"/> objects to start drag operations.
     /// </summary>
     public class DragImplementor {
         private readonly IDraggable draggable;
@@ -19,7 +19,7 @@ namespace SnapUi {
 
         public void DraggablePointerPressed(PointerPressedEventArgs e) {
             /*
-             * todo: should look into this, if a descendant is pressed, 
+             * if a descendant is pressed, 
              * it will be the "captured" control for the life of the drag operation, 
              * so rn we are transferring capture.
              * if this ever doesn't work i think we can just fix it by listening for 
@@ -34,11 +34,10 @@ namespace SnapUi {
                  *  EITHER WAY the easiest way to handle this is to just:
                  *      CANCEL the old drag.
                  */
-
-                //todo: if we ever have canceling logic for the drag operation, now would be the time to call Cancel()
+                preDragOp.Dispose();
                 preDragOp = null;
-                e.Pointer.Capture(null);
                 draggable.InvalidateVisual();
+                e.Pointer.Capture(null);
             } else {
                 if (e.Pointer.Captured != draggable) {
                     e.Pointer.Capture(draggable);

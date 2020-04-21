@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -33,18 +32,8 @@ namespace SnapUi {
             impl.DraggablePointerReleased(e);
         }
 
-        public void RenderPreview(DrawingContext context, Point origin) {
-            using (context.PushPreTransform(Matrix.CreateTranslation(origin))) {
+        public void RenderPreview(DrawingContext context)
+            => ((IVisual)this).RenderSelfAndDescendants(context);
 
-                Render(context);
-                
-                foreach (var v in ((IVisual)this).GetVisualDescendants()) {
-                    Matrix m = (Matrix)v.TransformToVisual(this)!;
-                    using (context.PushPreTransform(m)) {
-                        v.Render(context);
-                    }
-                }
-            }
-        }
     }
 }
