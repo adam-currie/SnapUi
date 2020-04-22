@@ -1,16 +1,20 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 
 namespace SnapUi {
-    public interface IDraggable : IControl {
+    public interface IDraggable : IControl, ILayoutable {
 
-        public void RenderPreview(DrawingContext context);
+        event System.EventHandler MeasureInvalidated;
+
+        protected internal void RenderPreview(DrawingContext context, IPreviewOfDraggable preview);
 
         public IDropZone DropZoneParent 
             => (Parent is IDropZone)? (IDropZone)Parent : throw new InvalidParentException(typeof(IDropZone));
 
+        public Size PreviewMeasureOverride(Size availableSize);
         /// <summary>
         /// Implements common logic for starting drag operations.
         /// </summary>

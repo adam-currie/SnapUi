@@ -9,21 +9,33 @@ namespace SnapUi {
 
     public class DragOp : IDragOp {
         private readonly IDraggable draggable;
-        private readonly DraggablePreview floatingPreviewImg;
+        private readonly PreviewOfDraggable floatingPreviewImg;
+        private readonly PreviewOfDraggable dropPreviewImg;
 
-        private IDropZone? candidateDropZone;
+        private IDropZone? __candidateDropZone;
+        private IDropZone? CandidateDropZone {
+            get => __candidateDropZone;
+            set {
+                if (value != __candidateDropZone) {
+                    __candidateDropZone?.RemovePreview(dropPreviewImg);
+                    value?.AddPreview(dropPreviewImg);
+                    __candidateDropZone = value;
+                }
+            }
+        }
 
         public bool IsDisposed {get; private set;}
 
         public DragOp(IDraggable draggable, Point startingPoint) {
             this.draggable = draggable;
 
-            floatingPreviewImg = new DraggablePreview(draggable);
+            floatingPreviewImg = new PreviewOfDraggable(draggable, true);
+            dropPreviewImg = new PreviewOfDraggable(draggable, false);
 
-            draggable.GetVisualAncestor<ISnapUiRoot>()
-                .OverlayLayer
-                .Children
-                .Add(floatingPreviewImg);
+            var children = draggable.GetVisualAncestor<ISnapUiRoot>()
+                .OverlayLayer.Children;
+            children.Add(floatingPreviewImg);
+
 
             //calling update to get some state correct before first draw
             Update(startingPoint);
@@ -63,7 +75,7 @@ namespace SnapUi {
                 candidateCandidateDropZone = null;
             }
 
-            candidateDropZone = candidateCandidateDropZone;
+            CandidateDropZone = candidateCandidateDropZone;
         }
 
         private void UpdateFloatingPreview(Point point) {
@@ -76,7 +88,7 @@ namespace SnapUi {
         private bool IsValidDropZoneOrCurrentParent(IVisual v) =>
             v == draggable.VisualParent ||
             !draggable.IsVisualAncestorOf(v) &&
-            ((v as IDropZone)?.CanAdd(draggable) ?? false);
+            ((v as IDropZone)?.CanAddDraggable(draggable) ?? false);
 
         /// <inheritdoc/>
         public void Release(Point point) {
@@ -84,12 +96,12 @@ namespace SnapUi {
                 throw new System.ObjectDisposedException(ToString());
             }
 
-            if (candidateDropZone != null) {
-                Debug.Assert(candidateDropZone != draggable.Parent);
+            if (CandidateDropZone != null) {
+                Debug.Assert(CandidateDropZone != draggable.Parent);
 
-                draggable.DropZoneParent.Remove(draggable);
-                candidateDropZone.Add(draggable);
-                candidateDropZone = null;
+                draggable.DropZoneParent.RemoveDraggable(draggable);
+                CandidateDropZone.AddDraggable(draggable);
+                CandidateDropZone = null;
             }
 
             draggable.InvalidateVisual();
@@ -101,6 +113,7 @@ namespace SnapUi {
             if (!IsDisposed) {
                 OverlayLayer overlay = (OverlayLayer)floatingPreviewImg.Parent;
                 overlay.Children.Remove(floatingPreviewImg);
+                CandidateDropZone = null;//property should do its own cleanup
                 IsDisposed = true;
             }
         }

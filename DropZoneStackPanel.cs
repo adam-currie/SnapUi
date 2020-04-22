@@ -2,36 +2,37 @@
 using System.Diagnostics;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using System;
+using System.Collections.Specialized;
 
 namespace SnapUi {
     public class DropZoneStackPanel : StackPanel, IDropZone {
+
+        protected override void ChildrenChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            base.ChildrenChanged(sender, e);
+            IsVisible = Children.Count > 0;//todo: placeholder control
+        }
 
         static DropZoneStackPanel() {
             //making this hit-testable by default
             BackgroundProperty.OverrideDefaultValue<DropZoneStackPanel>(Brushes.Pink);//debug (Brushes.Transparent);
         }
 
-        public void Add(IDraggable draggable) {
-            Debug.Assert(CanAdd(draggable));
-            
-            //todo: hide placeholder object
-
+        public void AddDraggable(IDraggable draggable) {
+            Debug.Assert(CanAddDraggable(draggable));
             Children.Add(draggable);
         }
 
-        public bool CanAdd(IDraggable draggable) => true;
+        public void AddPreview(IPreviewOfDraggable preview)
+            => Children.Add(preview);
 
-        public bool Remove(IDraggable draggable) {
-            bool removed = Children.Remove(draggable);
+        public bool CanAddDraggable(IDraggable draggable) 
+            => true;
 
-            if (removed) {
-                if (Children.Count == 0) {
-                    //todo: put placeholder here instead so we can still drag things here
-                    IsVisible = false;
-                }
-            }
+        public bool RemoveDraggable(IDraggable draggable) 
+            => Children.Remove(draggable);
 
-            return removed;
-        }
+        public bool RemovePreview(IPreviewOfDraggable preview)
+            => Children.Remove(preview);
     }
 }

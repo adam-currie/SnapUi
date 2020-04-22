@@ -1,12 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace SnapUi {
     public class DraggableBorder : Border, IDraggable {
         private readonly IDraggable.DragImplementor impl;
+        public event System.EventHandler? MeasureInvalidated;
 
         static DraggableBorder() {
             //make this hit-testable by default
@@ -48,8 +50,23 @@ namespace SnapUi {
             impl.DraggablePointerReleased(e);
         }
 
-        public void RenderPreview(DrawingContext context)
-            => ((IVisual)this).RenderSelfAndDescendants(context);
+        void IDraggable.RenderPreview(DrawingContext context, IPreviewOfDraggable preview) {
+            if (preview.IsFloating) {
+                ((IVisual)this).RenderSelfAndDescendants(context);
+            } else {
+                ArrangeCore((Rect)preview.PreviousArrange!);
+                ((IVisual)this).RenderSelfAndDescendants(context);
+                ArrangeCore((Rect)((ILayoutable)this).PreviousArrange!);
+            }
+        }
+        
 
+        protected override void OnMeasureInvalidated() {
+            base.OnMeasureInvalidated();
+            MeasureInvalidated?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        public Size PreviewMeasureOverride(Size availableSize)
+            => MeasureOverride(availableSize);
     }
 }
