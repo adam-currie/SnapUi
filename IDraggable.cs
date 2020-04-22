@@ -37,9 +37,11 @@ namespace SnapUi {
             set { SetValue(MinDragDistanceProperty, value); }
         }
 
+        public IDropZone DropZoneParent 
+            => (Parent is IDropZone)? (IDropZone)Parent : throw new InvalidParentException(typeof(IDropZone));
 
         /// <summary>
-        /// Implements common logic for <c cref="SnapUi.IDraggable"/> objects to start drag operations.
+        /// Implements common logic for starting drag operations.
         /// </summary>
         protected class DragImplementor {
             private readonly IDraggable draggable;

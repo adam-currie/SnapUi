@@ -86,6 +86,8 @@ namespace SnapUi {
 
             if (candidateDropZone != null) {
                 Debug.Assert(candidateDropZone != draggable.Parent);
+
+                draggable.DropZoneParent.Remove(draggable);
                 candidateDropZone.Add(draggable);
                 candidateDropZone = null;
             }
