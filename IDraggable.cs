@@ -6,36 +6,7 @@ using Avalonia.Media;
 namespace SnapUi {
     public interface IDraggable : IControl {
 
-        public enum PreviewStyles {
-            /// <summary>
-            /// Shows the full control in the candidate drop zone.
-            /// </summary>
-            Full,
-            /// <summary>
-            /// Shows only a highlight of the controls area in the drop zone.
-            /// </summary>
-            Highlight
-        }
-
-        //todo: PreviewOpacity styled property
-
-        public static readonly StyledProperty<PreviewStyles> PreviewStyleProperty =
-            AvaloniaProperty.Register<IDraggable, PreviewStyles>(nameof(PreviewStyle), default, true);
-
-        public PreviewStyles PreviewStyle {
-            get { return GetValue(PreviewStyleProperty); }
-            set { SetValue(PreviewStyleProperty, value); }
-        }
-
         public void RenderPreview(DrawingContext context);
-
-        public static readonly StyledProperty<int> MinDragDistanceProperty =
-            AvaloniaProperty.Register<IDraggable, int>(nameof(MinDragDistance), 10, true);
-
-        public int MinDragDistance {
-            get { return GetValue(MinDragDistanceProperty); }
-            set { SetValue(MinDragDistanceProperty, value); }
-        }
 
         public IDropZone DropZoneParent 
             => (Parent is IDropZone)? (IDropZone)Parent : throw new InvalidParentException(typeof(IDropZone));
@@ -45,10 +16,12 @@ namespace SnapUi {
         /// </summary>
         protected class DragImplementor {
             private readonly IDraggable draggable;
-            private MinDistanceDragOp? preDragOp = null;
+            private readonly IDragOp.Factory dragFactory;
+            private IDragOp? dragOp = null;
 
-            public DragImplementor(IDraggable draggable) {
+            public DragImplementor(IDraggable draggable, IDragOp.Factory dragFactory) {
                 this.draggable = draggable;
+                this.dragFactory = dragFactory;
             }
 
             /* todo: maybe have to handle oncapturelost, doing some type of pointer release stuff, in case an ancestor steals control
@@ -64,7 +37,7 @@ namespace SnapUi {
                  * InputElement.PointerMoved and InputElement.PointerReleased events even with the Handled property set to true
                  */
 
-                if (preDragOp != null) {
+                if (dragOp != null) {
                     /*  this is likely A: 
                      *      common(unavoidable?) issue where a pointer release event is not fired.
                      *  or B:
@@ -72,15 +45,15 @@ namespace SnapUi {
                      *  EITHER WAY the easiest way to handle this is to just:
                      *      CANCEL the old drag.
                      */
-                    preDragOp.Dispose();
-                    preDragOp = null;
+                    dragOp.Dispose();
+                    dragOp = null;
                     draggable.InvalidateVisual();
                     e.Pointer.Capture(null);
                 } else {
                     if (e.Pointer.Captured != draggable) {
                         e.Pointer.Capture(draggable);
                     }
-                    preDragOp = new MinDistanceDragOp(draggable, e.GetPosition(draggable));
+                    dragOp = dragFactory(draggable, e.GetPosition(draggable));
                 }
 
                 e.Handled = true;
@@ -88,15 +61,15 @@ namespace SnapUi {
 
             public void DraggablePointerMoved(PointerEventArgs e) {
                 if (e.Pointer.Captured == draggable) {
-                    preDragOp!.Update(e.GetPosition(draggable));
+                    dragOp!.Update(e.GetPosition(draggable));
                     e.Handled = true;
                 }
             }
 
             public void DraggablePointerReleased(PointerReleasedEventArgs e) {
                 if (e.Pointer.Captured == draggable) {
-                    preDragOp!.Release(e.GetPosition(draggable));
-                    preDragOp = null;
+                    dragOp!.Release(e.GetPosition(draggable));
+                    dragOp = null;
                     e.Handled = true;
                 }
             }

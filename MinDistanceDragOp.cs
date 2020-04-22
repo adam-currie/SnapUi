@@ -8,16 +8,17 @@ namespace SnapUi {
     public class MinDistanceDragOp : IDragOp {
         private readonly IDraggable draggable;
         private readonly Point startingPoint;
+        private readonly int minDistSquared;
+        private readonly IDragOp.Factory dragFactory;
 
-        //todo: maybe dependency injection?
-        IDragOp? dragOp = null;
+        IDragOp? subDragOp = null;
 
         private bool _isDisposed = false;
         public bool IsDisposed {
             get {
                 if (_isDisposed) {
                     return true;
-                } else if (dragOp?.IsDisposed ?? false) {
+                } else if (subDragOp?.IsDisposed ?? false) {
                     return _isDisposed = true;
                 } else {
                     return false;
@@ -25,9 +26,11 @@ namespace SnapUi {
             }
         }
 
-        public MinDistanceDragOp(IDraggable draggable, Point point) {
+        public MinDistanceDragOp(IDraggable draggable, Point point, int minDragDistance, IDragOp.Factory dragFactory) {
             this.draggable = draggable;
             this.startingPoint = point;
+            this.dragFactory = dragFactory;
+            minDistSquared = minDragDistance * minDragDistance;
         }
 
         public void Update(Point point) {
@@ -35,15 +38,14 @@ namespace SnapUi {
                 throw new System.ObjectDisposedException(ToString());
             }
 
-            if (dragOp != null) {
-                dragOp.Update(point);
+            if (subDragOp != null) {
+                subDragOp.Update(point);
             } else {
                 Point dif = point - startingPoint;
                 double distanceSquared = (dif.X * dif.X) + (dif.Y * dif.Y);
 
-                int minDist = draggable.MinDragDistance;
-                if(distanceSquared >= minDist*minDist) {
-                    dragOp = new DragOp(draggable, point);
+                if(distanceSquared >= minDistSquared) {
+                    subDragOp = dragFactory(draggable, point);
                 }
             }
         }
@@ -54,16 +56,17 @@ namespace SnapUi {
                 throw new System.ObjectDisposedException(ToString());
             }
 
-            dragOp?.Release(point);
+            subDragOp?.Release(point);
         }
 
         public void Dispose() {
             if (!IsDisposed) {
-                if (dragOp != null && !(dragOp.IsDisposed)) {
-                    dragOp.Dispose();
+                if (subDragOp != null && !(subDragOp.IsDisposed)) {
+                    subDragOp.Dispose();
                 }
                 _isDisposed = true;
             }
         }
+
     }
 }

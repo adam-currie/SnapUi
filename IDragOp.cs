@@ -11,5 +11,7 @@ namespace SnapUi {
         /// <param name="point">The point.</param>
         public void Release(Point point);
 
+        public delegate IDragOp Factory(IDraggable draggable, Point startingPoint);
+
     }
 }

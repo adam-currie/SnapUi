@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -12,10 +13,25 @@ namespace SnapUi {
             BackgroundProperty.OverrideDefaultValue<DraggableBorder>(Brushes.Transparent);
         }
 
+        public static readonly StyledProperty<int> MinDragDistanceProperty =
+                AvaloniaProperty.Register<IDraggable, int>(nameof(MinDragDistance), 10, true);
+
+        public int MinDragDistance {
+            get { return GetValue(MinDragDistanceProperty); }
+            set { SetValue(MinDragDistanceProperty, value); }
+        }
+
+        //todo: PreviewOpacity styled property
 
         public DraggableBorder() {
-            impl = new IDraggable.DragImplementor(this);
+            impl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
         }
+
+        private IDragOp MakeMinDistDragOp(IDraggable draggable, Point startingPoint)
+            => new MinDistanceDragOp(draggable, startingPoint, MinDragDistance, MakePlainDragOp);
+
+        private IDragOp MakePlainDragOp(IDraggable draggable, Point startingPoint)
+            => new DragOp(draggable, startingPoint);
 
         protected override void OnPointerPressed(PointerPressedEventArgs e) {
             base.OnPointerPressed(e);
