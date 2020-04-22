@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 
 namespace SnapUi {
     public class DraggableBorder : Border, IDraggable {
-        private readonly DragImplementor impl;
+        private readonly IDraggable.DragImplementor impl;
 
         static DraggableBorder() {
             //make this hit-testable by default
@@ -14,7 +14,7 @@ namespace SnapUi {
 
 
         public DraggableBorder() {
-            impl = new DragImplementor(this);
+            impl = new IDraggable.DragImplementor(this);
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e) {
