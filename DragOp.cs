@@ -48,12 +48,17 @@ namespace SnapUi {
 
             ISnapUiRoot root = draggable.GetVisualAncestor<ISnapUiRoot>();
 
-            /* todo: check if root has changed and migrate everything
-             * -candidate dropzone may no longer be valid     
-             * -preview needs to be reparented
-             */
+            if (root.OverlayLayer != floatingPreviewImg.Parent) {
+                /*
+                 * Probably some smart alec messing with the hierarchy.
+                 * We don't need to worry about this for candidate dropzone 
+                 * since that updates with the new root anyway.
+                 */
+                ((OverlayLayer)floatingPreviewImg.Parent).Children.Remove(floatingPreviewImg);
+                root.OverlayLayer.Children.Add(floatingPreviewImg);
+            }
 
-            UpdateFloatingPreview(point);
+            UpdateFloatingPreviewPosition(point);
             UpdateCandidateDropZone(point, root);
         }
 
@@ -66,28 +71,23 @@ namespace SnapUi {
 
             IDropZone? candidateCandidateDropZone = root.VisualRoot.Renderer
                 .HitTest(rootPoint, root, (x) => true)
-                .Where(IsValidDropZoneOrCurrentParent)
+                .Where(IsValidDropZone)
                 .FirstOrDefault()
                 as IDropZone;
-
-            if (candidateCandidateDropZone == draggable.VisualParent) {
-                //we don't want to trigger any switching logic!
-                candidateCandidateDropZone = null;
-            }
 
             CandidateDropZone = candidateCandidateDropZone;
         }
 
-        private void UpdateFloatingPreview(Point point) {
+        private void UpdateFloatingPreviewPosition(Point point) {
             Point previewPoint =
                 (Point)((IVisual)draggable).TranslatePoint(point, floatingPreviewImg.Parent)!;
             floatingPreviewImg.RenderTransform =
                 new MatrixTransform(Matrix.CreateTranslation(previewPoint));
         }
 
-        private bool IsValidDropZoneOrCurrentParent(IVisual v) =>
-            v == draggable.VisualParent ||
-            !draggable.IsVisualAncestorOf(v) &&
+        private bool IsValidDropZone(IVisual v) =>
+            v != draggable.VisualParent &&      //can't go where we already are
+            !draggable.IsVisualAncestorOf(v) && //this would be like being your own grandfather
             ((v as IDropZone)?.CanAddDraggable(draggable) ?? false);
 
         /// <inheritdoc/>
@@ -113,7 +113,7 @@ namespace SnapUi {
             if (!IsDisposed) {
                 OverlayLayer overlay = (OverlayLayer)floatingPreviewImg.Parent;
                 overlay.Children.Remove(floatingPreviewImg);
-                CandidateDropZone = null;//property should do its own cleanup
+                CandidateDropZone = null;//property will do its own cleanup
                 IsDisposed = true;
             }
         }
