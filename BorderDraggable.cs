@@ -6,13 +6,13 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace SnapUi {
-    public class DraggableBorder : Border, IDraggable {
+    public class BorderDraggable : Border, IDraggable {
         private readonly IDraggable.DragImplementor impl;
         public event System.EventHandler? MeasureInvalidated;
 
-        static DraggableBorder() {
+        static BorderDraggable() {
             //make this hit-testable by default
-            BackgroundProperty.OverrideDefaultValue<DraggableBorder>(Brushes.Transparent);
+            BackgroundProperty.OverrideDefaultValue<BorderDraggable>(Brushes.Transparent);
         }
 
         public static readonly StyledProperty<int> MinDragDistanceProperty =
@@ -25,7 +25,7 @@ namespace SnapUi {
 
         //todo: PreviewOpacity styled property
 
-        public DraggableBorder() {
+        public BorderDraggable() {
             impl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
         }
 
