@@ -16,7 +16,7 @@
         MinWidth="75"
         Orientation="Horizontal">
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
@@ -26,14 +26,14 @@
             <TextBlock>drag3</TextBlock>
             <TextBlock>drag3</TextBlock>
           </SnapUi:DropZoneStackPanel>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag4</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
       </SnapUi:DropZoneStackPanel>
 
@@ -41,64 +41,65 @@
         DockPanel.Dock="Right"
         Orientation="Horizontal">
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag5</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
-        <SnapUi:DraggableBorder
-          Padding="32"
+          <SnapUi:BorderDraggable
+            Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag6</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
       </SnapUi:DropZoneStackPanel>
 
       <SnapUi:DropZoneStackPanel
         DockPanel.Dock="Top">
-        
-        <SnapUi:DraggableBorder
+
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag1</TextBlock>
-        </SnapUi:DraggableBorder>
-        
-        <SnapUi:DraggableBorder
+        </SnapUi:BorderDraggable>
+
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag2</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag9</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
-      </SnapUi:DropZoneStackPanel>
+      
+    </SnapUi:DropZoneStackPanel>
 
       <SnapUi:DropZoneStackPanel
         DockPanel.Dock="Bottom">
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag7</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
-        <SnapUi:DraggableBorder
+        <SnapUi:BorderDraggable
           Padding="32"
           Background="#20000000"
           BorderThickness="2">
           <TextBlock>drag8</TextBlock>
-        </SnapUi:DraggableBorder>
+        </SnapUi:BorderDraggable>
 
       </SnapUi:DropZoneStackPanel>
 
