@@ -8,7 +8,7 @@ using Serilog;
 using Serilog.Core;
 using System.Diagnostics;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
     internal class PreviewOfDraggable : Control, IPreviewOfDraggable {
         public IDraggable Draggable { get; }
 

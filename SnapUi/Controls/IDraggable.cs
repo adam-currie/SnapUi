@@ -4,7 +4,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
     public interface IDraggable : IControl, ILayoutable {
 
         event System.EventHandler MeasureInvalidated;

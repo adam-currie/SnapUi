@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
     public interface IDropZone : IControl {
         public void AddPreview(IPreviewOfDraggable preview);
         public bool RemovePreview(IPreviewOfDraggable preview);

@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
 
     /// <summary>
     /// Root element to implicitly limit the scope of drag/drop operations.

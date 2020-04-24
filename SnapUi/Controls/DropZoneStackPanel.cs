@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Avalonia.Media;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
     public class DropZoneStackPanel : StackPanel, IDropZone {
 
         //todo: check out Children.Validate

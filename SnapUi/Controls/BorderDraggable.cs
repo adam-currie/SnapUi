@@ -5,7 +5,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
-namespace SnapUi {
+namespace SnapUi.Controls {
     public class BorderDraggable : Border, IDraggable {
         private readonly IDraggable.DragImplementor impl;
         public event System.EventHandler? MeasureInvalidated;

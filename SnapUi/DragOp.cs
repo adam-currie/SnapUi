@@ -4,6 +4,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using System.Diagnostics;
 using System.Linq;
+using SnapUi.Controls;
 
 namespace SnapUi {
 
