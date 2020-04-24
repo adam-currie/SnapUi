@@ -1,12 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Layout;
-using Avalonia.Logging;
-using Avalonia.Logging.Serilog;
 using Avalonia.Media;
-using Serilog;
-using Serilog.Core;
-using System.Diagnostics;
 
 namespace SnapUi.Controls {
     internal class PreviewOfDraggable : Control, IPreviewOfDraggable {
