@@ -1,10 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using SnapUi.Controls;
 using System.Diagnostics;
 using System.Linq;
-using SnapUi.Controls;
 
 namespace SnapUi {
 
@@ -25,7 +26,7 @@ namespace SnapUi {
             }
         }
 
-        public bool IsDisposed {get; private set;}
+        public bool IsDisposed { get; private set; }
 
         public DragOp(IDraggable draggable, Point startingPoint) {
             this.draggable = draggable;
@@ -81,15 +82,16 @@ namespace SnapUi {
 
         private void UpdateFloatingPreviewPosition(Point point) {
             Point previewPoint =
-                (Point)((IVisual)draggable).TranslatePoint(point, floatingPreviewImg.Parent)!;
+                (Point)draggable.TranslatePoint(point, floatingPreviewImg.GetVisualParent())!;
             floatingPreviewImg.RenderTransform =
                 new MatrixTransform(Matrix.CreateTranslation(previewPoint));
         }
 
         private bool IsValidDropZone(IVisual v) =>
-            v != draggable.VisualParent &&      //can't go where we already are
-            !draggable.IsVisualAncestorOf(v) && //this would be like being your own grandfather
-            ((v as IDropZone)?.CanAddDraggable(draggable) ?? false);
+            (v is IDropZone dropZone) &&
+            !dropZone.LogicalChildren.Contains(draggable) && //can't go where we already are
+            !draggable.IsVisualAncestorOf(dropZone) &&      //this would be like being your own grandfather
+            dropZone.CanAddDraggable(draggable);
 
         /// <inheritdoc/>
         public void Release(Point point) {
@@ -98,14 +100,17 @@ namespace SnapUi {
             }
 
             if (CandidateDropZone != null) {
-                Debug.Assert(CandidateDropZone != draggable.Parent);
+                Debug.Assert(!CandidateDropZone.GetLogicalChildren().Contains(draggable));
+
+                /*
+                 * removing draggable from old dropzone should cause this dragop 
+                 * to be disposed so we need to cache state here
+                 */
+                IDropZone candidate = CandidateDropZone;
 
                 draggable.DropZoneParent.RemoveDraggable(draggable);
-                CandidateDropZone.AddDraggable(draggable);
-                CandidateDropZone = null;
+                candidate.AddDraggable(draggable);
             }
-
-            draggable.InvalidateVisual();
 
             Dispose();
         }
