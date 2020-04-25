@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
-using System.Diagnostics;
 using Avalonia.Media;
+using System.Diagnostics;
 
 namespace SnapUi.Controls {
     public class DropZoneStackPanel : StackPanel, IDropZone {
@@ -20,7 +20,7 @@ namespace SnapUi.Controls {
         public void AddPreview(IPreviewOfDraggable preview)
             => Children.Add(preview);
 
-        public bool CanAddDraggable(IDraggable draggable) 
+        public bool CanAddDraggable(IDraggable draggable)
             => true;
 
         public bool RemoveDraggable(IDraggable draggable)

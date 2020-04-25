@@ -15,7 +15,7 @@ namespace SnapUi {
         IDragOp? subDragOp = null;
 
         private bool _lazyIsDisposed = false;
-        public bool IsDisposed => 
+        public bool IsDisposed =>
             (_lazyIsDisposed || subDragOp == null) ?
                 _lazyIsDisposed :
                 _lazyIsDisposed = subDragOp.IsDisposed;
@@ -38,7 +38,7 @@ namespace SnapUi {
                 Point dif = point - startingPoint;
                 double distanceSquared = (dif.X * dif.X) + (dif.Y * dif.Y);
 
-                if(distanceSquared >= minDistSquared) {
+                if (distanceSquared >= minDistSquared) {
                     subDragOp = dragFactory(draggable, point);
                 }
             }

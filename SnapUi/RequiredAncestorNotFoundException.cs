@@ -2,7 +2,7 @@
 
 namespace SnapUi {
 
-    public class RequiredAncestorNotFoundException: Exception {
+    public class RequiredAncestorNotFoundException : Exception {
 
         public RequiredAncestorNotFoundException()
             : base(CreateMessage()) { }

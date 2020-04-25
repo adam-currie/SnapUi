@@ -7,6 +7,6 @@ namespace SnapUi.Controls {
     /// Root element to implicitly limit the scope of drag/drop operations.
     /// </summary>
     public interface ISnapUiRoot : IControl {
-         public OverlayLayer OverlayLayer { get; }
+        public OverlayLayer OverlayLayer { get; }
     }
 }

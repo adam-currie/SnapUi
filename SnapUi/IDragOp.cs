@@ -1,6 +1,6 @@
 ﻿using Avalonia;
-using System.Reactive.Disposables;
 using SnapUi.Controls;
+using System.Reactive.Disposables;
 
 namespace SnapUi {
     public interface IDragOp : ICancelable {

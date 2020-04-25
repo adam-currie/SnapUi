@@ -4,7 +4,7 @@ using Avalonia.LogicalTree;
 
 namespace SnapUi.Controls {
     public class SnapUiRoot : Decorator, ISnapUiRoot {
-        
+
         public OverlayLayer OverlayLayer { get; }
 
         public SnapUiRoot() {
