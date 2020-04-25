@@ -3,18 +3,22 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 
 namespace SnapUi.Controls {
     public interface IDraggable : IControl, ILayoutable {
 
-        event System.EventHandler MeasureInvalidated;
+        public event System.EventHandler MeasureInvalidated;
 
         protected internal void RenderPreview(DrawingContext context, IPreviewOfDraggable preview);
 
-        public IDropZone DropZoneParent 
-            => (Parent is IDropZone)? (IDropZone)Parent : throw new InvalidParentException(typeof(IDropZone));
+        public IDropZone DropZoneParent => 
+            (Parent is IDropZone parent) ? 
+                parent : 
+                throw new InvalidParentException(typeof(IDropZone));
 
         public Size PreviewMeasureOverride(Size availableSize);
+
         /// <summary>
         /// Implements common logic for starting drag operations.
         /// </summary>
@@ -26,6 +30,9 @@ namespace SnapUi.Controls {
             public DragImplementor(IDraggable draggable, IDragOp.Factory dragFactory) {
                 this.draggable = draggable;
                 this.dragFactory = dragFactory;
+
+                draggable.DetachedFromVisualTree += 
+                    (s, e) => Cancel();
             }
 
             /* todo: maybe have to handle oncapturelost, doing some type of pointer release stuff, in case an ancestor steals control
@@ -77,6 +84,14 @@ namespace SnapUi.Controls {
                     e.Handled = true;
                 }
             }
+
+            /// <summary>
+            /// Cancels current drag operation, if any.
+            /// </summary>
+            /// <remarks>
+            /// This is called automatically when the draggable fires <see cref="IVisual.DetachedFromVisualTree"/>.
+            /// </remarks>
+            public void Cancel() => dragOp?.Dispose();
 
         }
 
