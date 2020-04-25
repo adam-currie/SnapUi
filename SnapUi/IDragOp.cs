@@ -7,8 +7,11 @@ namespace SnapUi {
         public void Update(Point point);
 
         /// <summary>
-        /// Releases the drag operation, allowing a potential drop, this also calls <c cref="SnapUi.DragOp.Dispose()"/>
+        /// Releases the drag operation, allowing a potential drop.
         /// </summary>
+        /// <remarks>
+        /// This method calls <see cref="SnapUi.DragOp.Dispose()"/>.
+        /// </remarks>
         /// <param name="point">The point.</param>
         public void Release(Point point);
 
