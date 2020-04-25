@@ -6,21 +6,27 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace SnapUi.Controls {
-    public class BorderDraggable : Border, IDraggable {
+    public class DraggableDecorator : Decorator, IDraggable {
         private readonly IDraggable.DragImplementor dragImpl;
+
         public event System.EventHandler? MeasureInvalidated;
 
-        static BorderDraggable() {
+        public override void Render(DrawingContext context) {
             //make this hit-testable by default
-            BackgroundProperty.OverrideDefaultValue<BorderDraggable>(Brushes.Transparent);
+            context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
+            base.OnAttachedToVisualTree(e);
+            //todo:  make sure this is in a dropzone
         }
 
         public static readonly StyledProperty<int> MinDragDistanceProperty =
                 AvaloniaProperty.Register<IDraggable, int>(nameof(MinDragDistance), 10, true);
 
         public int MinDragDistance {
-            get { return GetValue(MinDragDistanceProperty); }
-            set { SetValue(MinDragDistanceProperty, value); }
+            get => GetValue(MinDragDistanceProperty);
+            set => SetValue(MinDragDistanceProperty, value);
         }
 
         private IDragOp MakeMinDistDragOp(IDraggable draggable, Point startingPoint)
@@ -32,7 +38,7 @@ namespace SnapUi.Controls {
 
         //todo: PreviewOpacity styled property
 
-        public BorderDraggable() {
+        public DraggableDecorator() {
             dragImpl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
         }
 
@@ -60,7 +66,7 @@ namespace SnapUi.Controls {
                 ArrangeCore((Rect)((ILayoutable)this).PreviousArrange!);
             }
         }
-        
+
 
         protected override void OnMeasureInvalidated() {
             base.OnMeasureInvalidated();
