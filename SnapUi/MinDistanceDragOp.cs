@@ -14,18 +14,11 @@ namespace SnapUi {
 
         IDragOp? subDragOp = null;
 
-        private bool _isDisposed = false;
-        public bool IsDisposed {
-            get {
-                if (_isDisposed) {
-                    return true;
-                } else if (subDragOp?.IsDisposed ?? false) {
-                    return _isDisposed = true;
-                } else {
-                    return false;
-                }
-            }
-        }
+        private bool _lazyIsDisposed = false;
+        public bool IsDisposed => 
+            (_lazyIsDisposed || subDragOp == null) ?
+                _lazyIsDisposed :
+                _lazyIsDisposed = subDragOp.IsDisposed;
 
         public MinDistanceDragOp(IDraggable draggable, Point point, int minDragDistance, IDragOp.Factory dragFactory) {
             this.draggable = draggable;
@@ -65,7 +58,7 @@ namespace SnapUi {
                 if (subDragOp != null && !(subDragOp.IsDisposed)) {
                     subDragOp.Dispose();
                 }
-                _isDisposed = true;
+                _lazyIsDisposed = true;
             }
         }
 
