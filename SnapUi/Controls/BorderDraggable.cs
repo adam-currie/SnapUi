@@ -7,7 +7,7 @@ using Avalonia.VisualTree;
 
 namespace SnapUi.Controls {
     public class BorderDraggable : Border, IDraggable {
-        private readonly IDraggable.DragImplementor impl;
+        private readonly IDraggable.DragImplementor dragImpl;
         public event System.EventHandler? MeasureInvalidated;
 
         static BorderDraggable() {
@@ -23,31 +23,32 @@ namespace SnapUi.Controls {
             set { SetValue(MinDragDistanceProperty, value); }
         }
 
-        //todo: PreviewOpacity styled property
-
-        public BorderDraggable() {
-            impl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
-        }
-
         private IDragOp MakeMinDistDragOp(IDraggable draggable, Point startingPoint)
             => new MinDistanceDragOp(draggable, startingPoint, MinDragDistance, MakePlainDragOp);
 
         private IDragOp MakePlainDragOp(IDraggable draggable, Point startingPoint)
             => new DragOp(draggable, startingPoint);
 
+
+        //todo: PreviewOpacity styled property
+
+        public BorderDraggable() {
+            dragImpl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
+        }
+
         protected override void OnPointerPressed(PointerPressedEventArgs e) {
             base.OnPointerPressed(e);
-            impl.DraggablePointerPressed(e);
+            dragImpl.DraggablePointerPressed(e);
         }
 
         protected override void OnPointerMoved(PointerEventArgs e) {
             base.OnPointerMoved(e);
-            impl.DraggablePointerMoved(e);
+            dragImpl.DraggablePointerMoved(e);
         }
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e) {
             base.OnPointerReleased(e);
-            impl.DraggablePointerReleased(e);
+            dragImpl.DraggablePointerReleased(e);
         }
 
         void IDraggable.RenderPreview(DrawingContext context, IPreviewOfDraggable preview) {
