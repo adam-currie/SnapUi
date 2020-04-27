@@ -17,7 +17,7 @@ namespace SnapUi.Controls {
             Children.Add(draggable);
         }
 
-        public void AddPreview(IPreviewOfDraggable preview)
+        public void AddPreview(IControl preview)
             => Children.Add(preview);
 
         public bool CanAddDraggable(IDraggable draggable)
@@ -26,7 +26,7 @@ namespace SnapUi.Controls {
         public bool RemoveDraggable(IDraggable draggable)
             => Children.Remove(draggable);
 
-        public bool RemovePreview(IPreviewOfDraggable preview)
+        public bool RemovePreview(IControl preview)
             => Children.Remove(preview);
     }
 }

@@ -4,12 +4,30 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using System;
+using System.Diagnostics;
 
 namespace SnapUi.Controls {
     public class DraggableDecorator : Decorator, IDraggable {
         private readonly IDraggable.DragImplementor dragImpl;
 
         public event System.EventHandler? MeasureInvalidated;
+
+        /// <summary>
+        /// Declares what preview states a control and it's descendants are visible for.
+        /// </summary>
+        /// <remarks>
+        /// IsVisible is ignored for preview rendering.
+        /// </remarks>
+        public enum PreviewVisibility {
+            All = 0,
+            None,
+            FloatingPreview,
+            DropPreview
+        }
+
+        public static readonly AttachedProperty<PreviewVisibility> PreviewVisibilityProperty =
+            AvaloniaProperty.RegisterAttached<DraggableDecorator, Control, PreviewVisibility>(name: "PreviewVisibility", inherits: true);
 
         public override void Render(DrawingContext context) {
             //make this hit-testable by default
@@ -57,23 +75,27 @@ namespace SnapUi.Controls {
             dragImpl.DraggablePointerReleased(e);
         }
 
-        void IDraggable.RenderPreview(DrawingContext context, IPreviewOfDraggable preview) {
-            if (preview.IsFloating) {
-                ((IVisual)this).RenderSelfAndDescendants(context);
-            } else {
-                ArrangeCore((Rect)preview.PreviousArrange!);
-                ((IVisual)this).RenderSelfAndDescendants(context);
-                ArrangeCore((Rect)((ILayoutable)this).PreviousArrange!);
-            }
-        }
-
-
         protected override void OnMeasureInvalidated() {
             base.OnMeasureInvalidated();
             MeasureInvalidated?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public Size PreviewMeasureOverride(Size availableSize)
-            => MeasureOverride(availableSize);
+        public Size RemoteRenderMeasureOverride(Size remoteAvailableSize) {
+            Size? realAvailableSize = ((ILayoutable)this).PreviousMeasure;//todo: handle this being null?
+
+            return (remoteAvailableSize == realAvailableSize) ?
+                DesiredSize :
+                MeasureOverride(remoteAvailableSize);
+        }
+
+        public void RemoteRender(RemoteViewer host, DrawingContext context, Rect temporaryArrangeCoreRect) {
+            ArrangeCore(temporaryArrangeCoreRect!);
+
+            //todo: if host is DragPreviewer, temporarily make visible all the descendants with the right PreviewVisibility property
+            ((IVisual)this).RenderSelfAndDescendants(context);
+
+            ArrangeCore((Rect)((ILayoutable)this).PreviousArrange!);
+        }
+
     }
 }

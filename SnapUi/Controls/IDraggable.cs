@@ -6,18 +6,12 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace SnapUi.Controls {
-    public interface IDraggable : IControl {
-
-        public event System.EventHandler MeasureInvalidated;
-
-        protected internal void RenderPreview(DrawingContext context, IPreviewOfDraggable preview);
+    public interface IDraggable : IRemoteViewingTarget {
 
         public IDropZone DropZoneParent =>
             (LogicalParent is IDropZone parent) ?
                 parent :
                 throw new InvalidParentException(typeof(IDropZone));
-
-        public Size PreviewMeasureOverride(Size availableSize);
 
         /// <summary>
         /// Implements common logic for starting drag operations.

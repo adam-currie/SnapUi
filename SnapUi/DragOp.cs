@@ -11,8 +11,8 @@ namespace SnapUi {
 
     public class DragOp : IDragOp {
         private readonly IDraggable draggable;
-        private readonly PreviewOfDraggable floatingPreviewImg;
-        private readonly PreviewOfDraggable dropPreviewImg;
+        private readonly DragPreviewer floatingPreviewImg;
+        private readonly DragPreviewer dropPreviewImg;
 
         private IDropZone? __candidateDropZone;
         private IDropZone? CandidateDropZone {
@@ -31,8 +31,8 @@ namespace SnapUi {
         public DragOp(IDraggable draggable, Point startingPoint) {
             this.draggable = draggable;
 
-            floatingPreviewImg = new PreviewOfDraggable(draggable, true);
-            dropPreviewImg = new PreviewOfDraggable(draggable, false);
+            floatingPreviewImg = new DragPreviewer(draggable, true);
+            dropPreviewImg = new DragPreviewer(draggable, false);
 
             var children = draggable.GetVisualAncestor<ISnapUiRoot>()
                 .OverlayLayer.Children;
