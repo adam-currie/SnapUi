@@ -1,9 +1,13 @@
 ﻿using Avalonia;
 using SnapUi.Controls;
+using System;
 using System.Reactive.Disposables;
 
-namespace SnapUi {
+namespace SnapUi.DragOps {
     public interface IDragOp : ICancelable {
+
+        public IDropZone? CandidateDropZone { get; }
+
         public void Update(Point point);
 
         /// <summary>
@@ -15,7 +19,7 @@ namespace SnapUi {
         /// <param name="point">The point.</param>
         public void Release(Point point);
 
-        public delegate IDragOp Factory(IDraggable draggable, Point startingPoint);
+        public delegate IDragOp Create(IDraggable draggable, Point startingPoint);
 
     }
 }

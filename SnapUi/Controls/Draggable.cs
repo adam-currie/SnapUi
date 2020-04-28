@@ -4,11 +4,12 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using SnapUi.DragOps;
 using System;
 using System.Diagnostics;
 
 namespace SnapUi.Controls {
-    public class DraggableDecorator : Decorator, IDraggable {
+    public class Draggable : Decorator, IDraggable {
         private readonly IDraggable.DragImplementor dragImpl;
 
         public event System.EventHandler? MeasureInvalidated;
@@ -27,7 +28,7 @@ namespace SnapUi.Controls {
         }
 
         public static readonly AttachedProperty<PreviewVisibility> PreviewVisibilityProperty =
-            AvaloniaProperty.RegisterAttached<DraggableDecorator, Control, PreviewVisibility>(name: "PreviewVisibility", inherits: true);
+            AvaloniaProperty.RegisterAttached<Draggable, Control, PreviewVisibility>(name: "PreviewVisibility", inherits: true);
 
         public override void Render(DrawingContext context) {
             //make this hit-testable by default
@@ -47,17 +48,15 @@ namespace SnapUi.Controls {
             set => SetValue(MinDragDistanceProperty, value);
         }
 
-        private IDragOp MakeMinDistDragOp(IDraggable draggable, Point startingPoint)
-            => new MinDistanceDragOp(draggable, startingPoint, MinDragDistance, MakePlainDragOp);
-
-        private IDragOp MakePlainDragOp(IDraggable draggable, Point startingPoint)
-            => new DragOp(draggable, startingPoint);
+        private IDragOp MakeDragOp(IDraggable draggable, Point startingPoint)
+            => new MinDistanceDragOp(draggable, startingPoint, MinDragDistance, 
+                (d,s) => new DragOp(d,s));
 
 
         //todo: PreviewOpacity styled property
 
-        public DraggableDecorator() {
-            dragImpl = new IDraggable.DragImplementor(this, MakeMinDistDragOp);
+        public Draggable() {
+            dragImpl = new IDraggable.DragImplementor(this, MakeDragOp);
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e) {

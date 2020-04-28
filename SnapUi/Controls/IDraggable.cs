@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using SnapUi.DragOps;
 
 namespace SnapUi.Controls {
     public interface IDraggable : IRemoteViewingTarget {
@@ -18,10 +19,10 @@ namespace SnapUi.Controls {
         /// </summary>
         protected class DragImplementor {
             private readonly IDraggable draggable;
-            private readonly IDragOp.Factory dragFactory;
+            private readonly IDragOp.Create dragFactory;
             private IDragOp? dragOp = null;
 
-            public DragImplementor(IDraggable draggable, IDragOp.Factory dragFactory) {
+            public DragImplementor(IDraggable draggable, IDragOp.Create dragFactory) {
                 this.draggable = draggable;
                 this.dragFactory = dragFactory;
 

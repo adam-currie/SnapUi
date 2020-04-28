@@ -4,10 +4,11 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using SnapUi.Controls;
+using System;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SnapUi {
+namespace SnapUi.DragOps {
 
     public class DragOp : IDragOp {
         private readonly IDraggable draggable;
@@ -15,9 +16,9 @@ namespace SnapUi {
         private readonly DragPreviewer dropPreviewImg;
 
         private IDropZone? __candidateDropZone;
-        private IDropZone? CandidateDropZone {
+        public IDropZone? CandidateDropZone {
             get => __candidateDropZone;
-            set {
+            private set {
                 if (value != __candidateDropZone) {
                     __candidateDropZone?.RemovePreview(dropPreviewImg);
                     value?.AddPreview(dropPreviewImg);
